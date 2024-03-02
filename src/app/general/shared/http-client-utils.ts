@@ -3,7 +3,6 @@ import { ErrorApp } from './error-app';
 
 export class HttpClientUtils {
     static process(error: HttpErrorResponse): ErrorApp {
-        debugger;
         let errorApp: ErrorApp = null;
         const mainError = error.error;
         switch (error.status) {
