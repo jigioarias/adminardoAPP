@@ -9,6 +9,9 @@ import { User } from '../model/user';
     providedIn: 'root',
 })
 export class AuthService {
+
+    userInRecovery: string;
+
     private readonly urlApiAuth = `${environment.endpointApi}/v1/auth`;
 
     constructor(private http: HttpClient) {}
@@ -38,6 +41,40 @@ export class AuthService {
                     return throwError(errorApp);
                 })
             );
+    }
+
+    forgotPwd(user: string) {
+        this.userInRecovery = user;
+        return this.http
+            .post<any>(`${this.urlApiAuth}/forgotPassword`, { user: user })
+            .pipe(
+                switchMap((respuesta) => of(respuesta)),
+                catchError((error) => {
+                    const errorApp = HttpClientUtils.process(error);
+                    return throwError(errorApp);
+                })
+            );
+    }
+
+    recovery(code: string, password: string) {
+        const infoRecovery = {
+            code: code,
+            newPassword: password,
+            user: this.userInRecovery
+          }
+        return this.http
+            .post<any>(`${this.urlApiAuth}/resetPassword`, infoRecovery)
+            .pipe(
+                switchMap((respuesta) => of(respuesta)),
+                catchError((error) => {
+                    const errorApp = HttpClientUtils.process(error);
+                    return throwError(errorApp);
+                })
+            );
+    }
+
+    isUserInRecovery(): boolean{
+        return !!this.userInRecovery;
     }
 
     isLoggedIn() {
